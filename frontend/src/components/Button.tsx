@@ -1,37 +1,21 @@
-import { ButtonHTMLAttributes } from 'react';
-import styles from './Button.module.css';
+import { ReactNode, MouseEventHandler } from 'react';
 
-// 버튼 종류
-export type ButtonVariant = 'primary' | 'secondary';
-
-// 버튼 크기
-export type ButtonSize = 'small' | 'medium' | 'large';
-
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  // 버튼 종류 (기본값: primary)
-  variant?: ButtonVariant;
-  // 버튼 크기 (기본값: medium)
-  size?: ButtonSize;
+interface ButtonProps {
+  // 버튼에 표시할 라벨(자식 노드)
+  children: ReactNode;
+  // 클릭 이벤트 핸들러
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  // 비활성화 상태
+  disabled?: boolean;
+  // 버튼 타입 (기본값: button)
+  type?: 'button' | 'submit';
 }
 
-export function Button({
-  variant = 'primary',
-  size = 'medium',
-  type = 'button',
-  className,
-  children,
-  ...rest
-}: ButtonProps) {
-  // variant / size / 추가 className 을 조합
-  const classes = [styles.button, styles[variant], styles[size], className]
-    .filter(Boolean)
-    .join(' ');
-
+// 재사용 가능한 Button 컴포넌트의 기본 구조
+export function Button({ children, onClick, disabled = false, type = 'button' }: ButtonProps) {
   return (
-    <button type={type} className={classes} {...rest}>
+    <button type={type} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );
 }
-
-export default Button;
