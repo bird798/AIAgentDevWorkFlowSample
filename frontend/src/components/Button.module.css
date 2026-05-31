@@ -1,0 +1,71 @@
+/* Button 기본 스타일 */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* variant: primary */
+.primary {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.primary:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.primary:active {
+  background-color: #1e40af;
+  border-color: #1e40af;
+}
+
+/* variant: secondary */
+.secondary {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.secondary:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.secondary:active {
+  background-color: #e5e7eb;
+  border-color: #6b7280;
+}
+
+/* size: small */
+.small {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+/* size: medium */
+.medium {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* size: large */
+.large {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+/* disabled 상태 */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,35 +1,37 @@
 import { ButtonHTMLAttributes } from 'react';
+import styles from './Button.module.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+// 버튼 종류
+export type ButtonVariant = 'primary' | 'secondary';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+// 버튼 크기
+export type ButtonSize = 'small' | 'medium' | 'large';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  // 버튼 종류 (기본값: primary)
   variant?: ButtonVariant;
+  // 버튼 크기 (기본값: medium)
   size?: ButtonSize;
-}
-
-// variant/size 조합으로 클래스명을 생성한다
-function buildClassName(variant: ButtonVariant, size: ButtonSize, className?: string): string {
-  return ['btn', `btn--${variant}`, `btn--${size}`, className]
-    .filter(Boolean)
-    .join(' ');
 }
 
 export function Button({
   variant = 'primary',
-  size = 'md',
+  size = 'medium',
+  type = 'button',
   className,
   children,
-  type = 'button',
   ...rest
 }: ButtonProps) {
+  // variant / size / 추가 className 을 조합
+  const classes = [styles.button, styles[variant], styles[size], className]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <button
-      type={type}
-      className={buildClassName(variant, size, className)}
-      {...rest}
-    >
+    <button type={type} className={classes} {...rest}>
       {children}
     </button>
   );
 }
+
+export default Button;
