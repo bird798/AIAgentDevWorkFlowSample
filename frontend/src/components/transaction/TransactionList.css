@@ -1,0 +1,88 @@
+/* 내역 목록 컨테이너 */
+.transaction-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 내역 한 건 */
+.transaction-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  /* 수입/지출 구분을 위한 좌측 강조선 */
+  border-left-width: 4px;
+}
+
+/* 수입: 파란색 계열로 구분 */
+.transaction-item--income {
+  border-left-color: #2563eb;
+}
+
+.transaction-item--income .transaction-item__amount {
+  color: #2563eb;
+}
+
+/* 지출: 빨간색 계열로 구분 */
+.transaction-item--expense {
+  border-left-color: #dc2626;
+}
+
+.transaction-item--expense .transaction-item__amount {
+  color: #dc2626;
+}
+
+/* 카테고리 + 금액 (상단 줄) */
+.transaction-item__main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-item__category {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.transaction-item__amount {
+  font-weight: 700;
+}
+
+/* 날짜 + 메모 (하단 줄) */
+.transaction-item__sub {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.transaction-item__memo {
+  /* 메모가 길 경우 말줄임 처리 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 빈 상태 */
+.transaction-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+}
+
+.transaction-empty__text {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
