@@ -1,0 +1,132 @@
+/* 예산 관리 컴포넌트 - 카드형 레이아웃 */
+.budget-manager {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+.budget-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 1.25rem;
+}
+
+.budget-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.budget-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.budget-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.budget-input {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.budget-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.budget-save-button {
+  padding: 0.625rem 1.25rem;
+  background-color: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.budget-save-button:hover {
+  background-color: #4338ca;
+}
+
+.budget-status {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.budget-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.budget-amount-item strong {
+  display: block;
+  font-size: 1rem;
+  color: #1a1a1a;
+  margin-top: 0.125rem;
+}
+
+/* 예산 대비 지출 비율 막대 */
+.budget-progress {
+  width: 100%;
+  height: 0.625rem;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.budget-progress-bar {
+  height: 100%;
+  background-color: #4f46e5;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* 예산 초과 시 막대 색상 변경 */
+.budget-progress-bar--over {
+  background-color: #dc2626;
+}
+
+.budget-ratio-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+/* 예산 초과 경고 */
+.budget-warning {
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #dc2626;
+}
