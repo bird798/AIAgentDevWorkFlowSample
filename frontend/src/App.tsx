@@ -6,8 +6,11 @@ import BudgetManager from './components/budget/BudgetManager';
 import { Button } from './components/Button';
 import { Transaction, NewTransaction } from './types/transaction';
 
-// BudgetManager 가 localStorage 에 예산을 저장할 때 사용하는 키 접두사
+// 예산이 저장되는 localStorage 키 접두사 (BudgetManager 와 동일)
 const BUDGET_KEY_PREFIX = 'budget:';
+
+// 초기화 확인 다이얼로그에 표시할 메시지
+const RESET_CONFIRM_MESSAGE = '모든 내역을 삭제하시겠습니까?';
 
 // 현재 연-월을 'YYYY-MM' 형식으로 반환
 function getCurrentMonth(): string {
@@ -22,35 +25,43 @@ function calcMonthlyExpense(transactions: Transaction[], month: string): number 
     .reduce((sum, t) => sum + t.amount, 0);
 }
 
-// localStorage 에서 'budget:' 접두사를 가진 모든 예산 키를 삭제
-function clearBudgetStorage(): void {
-  const keysToRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
+// localStorage 에 저장된 예산(budget:) 키를 모두 삭제
+function clearStoredBudgets(): void {
+  const keys: string[] = [];
+  for (let i = 0; i < localStorage.length; i += 1) {
     const key = localStorage.key(i);
-    if (key !== null && key.startsWith(BUDGET_KEY_PREFIX)) {
-      keysToRemove.push(key);
+    if (key && key.startsWith(BUDGET_KEY_PREFIX)) {
+      keys.push(key);
     }
   }
-  keysToRemove.forEach(key => localStorage.removeItem(key));
+  keys.forEach(key => localStorage.removeItem(key));
 }
 
 let nextId = 1;
 
 const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // 초기화 시 값을 증가시켜 BudgetManager 를 강제로 다시 마운트(예산 현황 갱신)
-  const [resetKey, setResetKey] = useState(0);
+  // 초기화 시 BudgetManager 를 강제로 다시 마운트해 빈 상태로 갱신하기 위한 값
+  const [resetNonce, setResetNonce] = useState(0);
   const currentMonth = getCurrentMonth();
 
   const handleSubmit = (newTx: NewTransaction) => {
     setTransactions(prev => [...prev, { ...newTx, id: String(nextId++) }]);
   };
 
-  // 화면 초기화: 거래 내역 state 와 저장된 예산 데이터를 모두 비운다
+  // 모든 거래 내역과 저장된 예산을 초기 상태로 되돌린다
   const handleReset = () => {
     setTransactions([]);
-    clearBudgetStorage();
-    setResetKey(prev => prev + 1);
+    clearStoredBudgets();
+    // key 변경으로 BudgetManager 를 재마운트해 비워진 예산을 반영
+    setResetNonce(prev => prev + 1);
+  };
+
+  // 초기화 버튼 클릭 시 확인을 받고, 확인한 경우에만 초기화를 실행
+  const handleResetClick = () => {
+    if (window.confirm(RESET_CONFIRM_MESSAGE)) {
+      handleReset();
+    }
   };
 
   const totalSpent = calcMonthlyExpense(transactions, currentMonth);
@@ -62,12 +73,17 @@ const App: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '24px 16px', fontFamily: 'sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 24,
+        }}
+      >
         <h1 style={{ margin: 0 }}>가계부</h1>
-        <button type="button" onClick={handleReset}>
-          초기화
-        </button>
-      </div>
+        <Button onClick={handleResetClick}>초기화</Button>
+      </header>
 
       <section style={{ marginBottom: 32 }}>
         <h2 style={{ marginBottom: 12 }}>내역 입력</h2>
@@ -79,7 +95,7 @@ const App: React.FC = () => {
       </section>
 
       <section style={{ marginBottom: 32 }}>
-        <BudgetManager key={resetKey} totalSpent={totalSpent} month={currentMonth} />
+        <BudgetManager key={resetNonce} totalSpent={totalSpent} month={currentMonth} />
       </section>
 
       <section>

@@ -1,71 +1,98 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
-// 현재 연-월을 'YYYY-MM' 형식으로 반환 (App 내부 로직과 동일)
-function getCurrentMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+// 폼을 채워 거래 내역 한 건을 추가하는 헬퍼
+async function addTransaction(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText('날짜'), '2026-06-05');
+  await user.type(screen.getByLabelText('금액'), '12000');
+  await user.selectOptions(screen.getByLabelText('카테고리'), '식비');
+  // '저장' 버튼은 거래 폼과 예산 폼 두 곳에 있으므로 거래 폼(클래스 submit-button)을 지정
+  const submitButtons = screen.getAllByRole('button', { name: '저장' });
+  const transactionSubmit = submitButtons.find(btn =>
+    btn.classList.contains('submit-button'),
+  );
+  await user.click(transactionSubmit as HTMLElement);
 }
 
-// 지출 내역 하나를 폼으로 입력하는 헬퍼
-async function addExpense(user: ReturnType<typeof userEvent.setup>) {
-  // 거래 입력 폼은 '날짜' 라벨이 속한 form 으로 특정한다 (BudgetManager 의 저장 버튼과 구분)
-  const form = screen.getByLabelText('날짜').closest('form') as HTMLFormElement;
-  const formScope = within(form);
-
-  await user.type(formScope.getByLabelText('날짜'), `${getCurrentMonth()}-10`);
-  await user.type(formScope.getByLabelText('금액'), '12000');
-  await user.selectOptions(formScope.getByLabelText('카테고리'), '식비');
-  await user.click(formScope.getByRole('button', { name: '저장' }));
-}
-
-describe('App 화면 초기화', () => {
-  beforeEach(() => {
+describe('App 초기화 확인 다이얼로그', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
     localStorage.clear();
   });
 
-  it('초기화 버튼을 클릭하면 거래 내역 목록이 비워진다', async () => {
+  // 헤더 우측에 초기화 버튼이 렌더링되는지 확인
+  it('초기화 버튼을 렌더링한다', () => {
+    render(<App />);
+    expect(screen.getByRole('button', { name: '초기화' })).toBeInTheDocument();
+  });
+
+  // 확인(true) 케이스: 확인 메시지가 표시되고 내역이 비워진다
+  it('초기화 확인 시 거래 내역을 모두 삭제한다', async () => {
     const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<App />);
 
-    await addExpense(user);
+    await addTransaction(user);
+    // 추가된 내역(카테고리 '식비')이 목록에 표시됨 (select 옵션과 구분)
+    expect(
+      screen.getByText('식비', { selector: '.transaction-item__category' }),
+    ).toBeInTheDocument();
 
-    // 입력한 내역(식비)이 목록 항목으로 표시되는지 확인
-    // (카테고리 select 의 <option> 과 구분하기 위해 목록 항목 셀렉터로 좁힌다)
-    const listItemSelector = { selector: '.transaction-item__category' };
-    expect(screen.getByText('식비', listItemSelector)).toBeInTheDocument();
-    expect(screen.queryByText('등록된 내역이 없습니다.')).not.toBeInTheDocument();
-
-    // 초기화 실행
     await user.click(screen.getByRole('button', { name: '초기화' }));
 
-    // 목록이 빈 상태로 갱신되었는지 확인
-    expect(screen.queryByText('식비', listItemSelector)).not.toBeInTheDocument();
+    // 확인 다이얼로그가 안내 메시지와 함께 호출됨
+    expect(confirmSpy).toHaveBeenCalledWith('모든 내역을 삭제하시겠습니까?');
+    // 내역이 비워져 빈 상태 안내가 표시됨
+    expect(
+      screen.queryByText('식비', { selector: '.transaction-item__category' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('등록된 내역이 없습니다.')).toBeInTheDocument();
   });
 
-  it('초기화 시 localStorage 의 예산 데이터가 삭제되고 예산 현황이 사라진다', async () => {
+  // 취소(false) 케이스: 아무 동작도 일어나지 않는다
+  it('초기화 취소 시 거래 내역을 그대로 유지한다', async () => {
     const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
     render(<App />);
 
-    const month = getCurrentMonth();
-    const budgetForm = screen.getByLabelText('월별 예산').closest('form') as HTMLFormElement;
-    const budgetScope = within(budgetForm);
+    await addTransaction(user);
+    expect(
+      screen.getByText('식비', { selector: '.transaction-item__category' }),
+    ).toBeInTheDocument();
 
-    // 예산을 저장하면 localStorage 에 'budget:{YYYY-MM}' 키가 생긴다
-    await user.type(budgetScope.getByLabelText('월별 예산'), '100000');
-    await user.click(budgetScope.getByRole('button', { name: '저장' }));
-
-    expect(localStorage.getItem(`budget:${month}`)).toBe('100000');
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
-
-    // 초기화 실행
     await user.click(screen.getByRole('button', { name: '초기화' }));
 
-    // 예산 키가 삭제되고 사용 현황(progressbar)도 사라졌는지 확인
-    expect(localStorage.getItem(`budget:${month}`)).toBeNull();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(confirmSpy).toHaveBeenCalledWith('모든 내역을 삭제하시겠습니까?');
+    // 취소했으므로 내역이 유지됨
+    expect(
+      screen.getByText('식비', { selector: '.transaction-item__category' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('등록된 내역이 없습니다.')).not.toBeInTheDocument();
+  });
+
+  // 확인(true) 케이스: 저장된 예산(budget:) localStorage 키도 삭제된다
+  it('초기화 확인 시 저장된 예산 데이터를 삭제한다', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    localStorage.setItem('budget:2026-06', '500000');
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: '초기화' }));
+
+    expect(localStorage.getItem('budget:2026-06')).toBeNull();
+  });
+
+  // 취소(false) 케이스: 저장된 예산 데이터가 유지된다
+  it('초기화 취소 시 저장된 예산 데이터를 유지한다', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    localStorage.setItem('budget:2026-06', '500000');
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: '초기화' }));
+
+    expect(localStorage.getItem('budget:2026-06')).toBe('500000');
   });
 });
