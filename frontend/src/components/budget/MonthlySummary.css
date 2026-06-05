@@ -1,0 +1,106 @@
+/* 월별 합계 카드 - 모바일 우선 레이아웃 */
+.summary-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.summary-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.summary-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.summary-month-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.summary-month-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #1a1a1a;
+}
+
+.summary-month-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  border-radius: 6px;
+  background-color: #f9fafb;
+}
+
+.summary-item-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.summary-item-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* 수입: 파란색 계열 */
+.summary-item--income .summary-item-value {
+  color: #2563eb;
+}
+
+/* 지출: 빨간색 계열 */
+.summary-item--expense .summary-item-value {
+  color: #dc2626;
+}
+
+/* 잔액: 강조 배경 */
+.summary-item--balance {
+  background-color: #eff6ff;
+}
+
+.summary-item--balance .summary-item-value {
+  color: #1a1a1a;
+}
+
+/* 잔액이 음수일 때 빨간색 강조 */
+.summary-item--negative .summary-item-value {
+  color: #dc2626;
+}
+
+/* 데스크탑 레이아웃 */
+@media (min-width: 640px) {
+  .summary-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
