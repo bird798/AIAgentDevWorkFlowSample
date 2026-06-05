@@ -3,6 +3,7 @@ import TransactionForm from './components/transaction/TransactionForm';
 import TransactionList from './components/transaction/TransactionList';
 import MonthlySummary from './components/budget/MonthlySummary';
 import BudgetManager from './components/budget/BudgetManager';
+import { Button } from './components/Button';
 import { Transaction, NewTransaction } from './types/transaction';
 
 // BudgetManager 가 localStorage 에 예산을 저장할 때 사용하는 키 접두사
@@ -53,6 +54,11 @@ const App: React.FC = () => {
   };
 
   const totalSpent = calcMonthlyExpense(transactions, currentMonth);
+
+  // 초기화 버튼 클릭 핸들러 (실제 동작은 후속 Sub-issue에서 연결)
+  const handleReset = () => {
+    // placeholder: 클릭 동작은 아직 연결되지 않음
+  };
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '24px 16px', fontFamily: 'sans-serif' }}>
