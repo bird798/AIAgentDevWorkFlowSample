@@ -81,7 +81,7 @@ const App: React.FC = () => {
           marginBottom: 24,
         }}
       >
-        <h1 style={{ margin: 0 }}>가계부</h1>
+        <h1 style={{ margin: 0 }}>부자되고 싶어요</h1>
         <Button onClick={handleResetClick}>초기화</Button>
       </header>
 
